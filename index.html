@@ -4,66 +4,199 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	
-	<title>Quick Start - Leaflet</title>
+	<title>MajesticRP heists helper</title>
 	
 	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js" integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ==" crossorigin=""></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <link href="http://fonts.cdnfonts.com/css/signpainter" rel="stylesheet">
+    <!--Stylesheets-->
+    <style media="screen">
+        body{
+            background-color: #1861ad;
+        }
+        .popup{
+            background-color: #ffffff;
+            width: 420px;
+            padding: 30px 40px;
+            position: absolute;
+            transform: translate(-50%,-50%);
+            left: 50%;
+            top: 50%;
+            border-radius: 8px;
+            font-family: "Poppins",sans-serif;
+            display: none; 
+            text-align: center;
+        }
+        .popup button{
+            border-radius: 10px;
+            border: 2px solid #203d74;
+            background-color: #2562d4;
+            font-size: 30px;
+            color: #FFFFFF;
+            padding: 2px;
+            width: 50%;
+            text-align: center;
+            transition-duration: 0.4s;
+            text-decoration: none;
+            overflow: hidden;
+            cursor: pointer;
+        }
 
-	<style>
-		html, body {
-			height: 100%;
-			margin: 0;
-		}
-		.leaflet-container {
+        .popup button:hover {
+            box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.5);
+        }
+        .popup h2{
+            margin-top: 5px;
+            font-family: 'SignPainter', sans-serif;
+            font-size: 50px;
+            text-shadow: 0 17px 50px black;
+        }
+        .popup p{
+            font-size: 14px;
+            text-align: justify;
+            margin: 20px 0;
+            line-height: 25px;
+        }
+        .popup h1{
+            font-size: 20px;
+            text-align: center;
+        }
+    </style>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        .leaflet-container {
             width: 1920px;
-			height: 1080px;
-			max-width: 100%;
-			max-height: 100%;
-		}
-	</style>
+            height: 1080px;
+            max-width: 100%;
+            max-height: 100%;
+            background-color: #1861ad;
+        }
+
+        .leaflet-control-zoom{
+            visibility: hidden;
+        }
+
+        .leaflet-bottom{
+            visibility: hidden;
+        }
+
+        .top-panel input[type=text] {
+            padding: 5px 5px;
+            margin: 8px;
+        }
+        .top-panel input[type=text]:focus {
+            border: 1px solid rgb(0, 0, 0);
+            background-color: lightblue;
+        }
+
+        .top-panel{
+            visibility: hidden;
+        }
+
+        .top-panel button{
+            position: relative;
+            border-radius: 10px;
+            border: 2px solid #203d74;
+            background-color: #2562d4;
+            font-size: 15px;
+            color: #FFFFFF;
+            padding: 2px;
+            width: 80px;
+            height: 30px;
+            text-align: center;
+            transition-duration: 0.4s;
+            text-decoration: none;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .top-panel button:after {
+            content: "";
+            background: #f1f1f1;
+            display: block;
+            position: absolute;
+            padding-top: 300%;
+            padding-left: 350%;
+            margin-left: -20px !important;
+            margin-top: -120%;
+            opacity: 0;
+            transition: all 0.8s
+        }
+
+        .top-panel button:active:after {
+            padding: 0;
+            margin: 0;
+            opacity: 1;
+            transition: 0s
+        }
+
+        .top-panel a{
+            font-family: 'SignPainter', sans-serif;
+        }
+    </style>
 
 </head>
 <body>
+    <div class="top-panel" id="top-panel">
+        <input id="shop"type="text" placeholder="24/7 Shop">
+        <input id="ammo" type="text" placeholder="Ammonation">
+        <input id="clothes"type="text" placeholder="Clothes shop">
+        <input id="tattoo" type="text" placeholder="Tattoo">
+        <input id="barber" type="text" placeholder="Barbershop">
+        <button onclick="set()">Set</button>
+        <button onclick="clearall()">Clear</button>
+        <button onclick="calc_route()">Calc</button>
+        <a>MajesticRP heists helper</a>
+    </div>
 
-<input id="shop"type="text" placeholder="24/7">
-<input id="ammo" type="text" placeholder="ammo">
-<input id="clothes"type="text" placeholder="clothes">
-<input id="tattoo" type="text" placeholder="tattoo">
-<input id="barber" type="text" placeholder="barber">
-<button onclick="set()">Set</button>
-<button onclick="clearall()">Clear</button>
-<button onclick="calc_route()">Calc</button>
-
-<div id="map" style="width: 1920px; height: 1080px;"></div>
-<script>
-    var height = window.innerHeight;
-    console.log(height)
-    var width = window.innerWidth;
-
+    <div id="map" style="width: 1920px; height: 1080px;"></div>
+    <script>
     
-    document.addEventListener("DOMContentLoaded", () => {
-        document.getElementsByClassName("leaflet-container").item(0).style.width = width+"px";
-        document.getElementsByClassName("leaflet-container").item(0).style.height = height+"px";
-        document.getElementById("map").style.width = width
-        document.getElementById("map").style.height = height
-    });
+        var map = L.map('map', {
+            crs: L.CRS.Simple,
+            minZoom:1,
+            maxZoom:1
+        });
+        var bounds = [[0,0], [1000,1000]];
+        var image = L.imageOverlay('./assets/images/map.jpg', bounds).addTo(map);
+        function create_map(){map.fitBounds(bounds);}
+
+    </script>
+    <script src="assets/js/main.js"></script>
+
+    <div class="popup">
+        <h2>MajesticRP heists helper</h2>
+        <p>
+            <h1>Инструмент предназначен для прокладки маршрута ограбления бизнесов.</h1>
+            В верхней панели в текстовых полях устанавливаются номера бизнесов для ограбления через пробел. После ввода номеров необходимо нажать на кнопку "set", маркеры появятся на карте. Далее необходимо поставить метку через левую кнопку мыши на исходную позицию(вашу, примерную). После выполнения этих пунктов нажмите на кнопку "calc" для построения маршрута. Для очистки нажмите на кнопку "clear".
+        </p>
+        <button id="close">Enjoy</button>
+    </div>
+    <!--Script-->
+    <script type="text/javascript">
+        window.addEventListener("load", function(){
+        setTimeout(
+            function open(event){
+                document.querySelector(".popup").style.display = "block";
+            },
+            2000 
+        )
+        });
 
 
-    var map = L.map('map', {
-        crs: L.CRS.Simple,
-        minZoom:1,
-        maxZoom:1
-    });
-    var bounds = [[0,0], [1000,1000]];
-    var image = L.imageOverlay('./assets/images/map.jpg', bounds).addTo(map);
-    map.fitBounds(bounds);
-
-    //document.querySelector("#map > div.leaflet-control-container > div.leaflet-bottom.leaflet-right").remove();
-
-</script>
-<script src="assets/js/main.js"></script>
+        document.querySelector("#close").addEventListener("click", function(){
+            document.querySelector(".popup").style.display = "none";
+            create_map();
+            document.getElementById("top-panel").style.visibility="visible";
+            document.getElementsByTagName("body").item(0).style.backgroundColor="#6e9fd3";
+        });
+    </script>
 
 </body>
 </html>
